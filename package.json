@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts",
     "build": "tsc",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "start:dev": "tsc && node dist/main.js"
   },
   "keywords": [],
   "author": "Ezequiel Imaz <tavelliezequiel@gmail.com>",
@@ -22,6 +23,9 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@xkairo/scrapy": "^0.2.0"
+    "@googlemaps/google-maps-services-js": "^3.3.33",
+    "@xkairo/scrapy": "^0.2.3",
+    "dotenv": "^16.3.1",
+    "xlsx": "^0.18.5"
   }
 }

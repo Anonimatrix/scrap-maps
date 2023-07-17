@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config();
+
 import Scraper from '@xkairo/scrapy';
 import { ScraperConfigInterface } from '@xkairo/scrapy-interfaces';
 import { CompanyInterface } from './companies/CompanyInterface';
@@ -5,24 +8,33 @@ import { LocalUploader } from '@xkairo/scrapy/dist/services/Uploaders/LocalUploa
 import { CsvProcessor } from '@xkairo/scrapy/dist/services/Processors/CsvProcessor';
 import { join } from 'path';
 import { CompanyScraper } from './companies/CompanyScraper';
+import { getCompaniesNames } from './utils/getCompaniesNames';
 
-const filepath = join(__dirname, '..', 'data', 'companies.csv');
+const filepathData = join(__dirname, '..', 'data', 'companies.xlsx');
+const filepathScrap = join(__dirname, '..', 'data', 'companiesScrap.csv');
 
-const config: ScraperConfigInterface<CompanyInterface> = {
-  uploaders: [LocalUploader],
-  processors: [CsvProcessor],
-  scrapers: [CompanyScraper],
-  providers: [
-    {
-      filepath: {
-        useValue: filepath,
+(async () => {
+  const companiesNames = await getCompaniesNames(filepathData, String(process.env.COUNTRY));
+
+  const configScraper: ScraperConfigInterface<CompanyInterface> = {
+    uploaders: [LocalUploader],
+    processors: [CsvProcessor],
+    scrapers: [CompanyScraper],
+    providers: [
+      {
+        filepath: {
+          useValue: filepathScrap,
+        },
+        searchs: {
+          useValue: companiesNames,
+        },
       },
-    },
-  ],
-};
+    ],
+  };
 
-const scraper = new Scraper(config);
+  const scraper = new Scraper(configScraper);
 
-scraper.scrap().then(() => {
-  console.log('Done');
-});
+  scraper.init().then(() => {
+    console.log('Done');
+  });
+})();
