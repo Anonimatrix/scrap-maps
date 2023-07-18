@@ -2,19 +2,31 @@ import { Inject, Injectable } from '@xkairo/scrapy';
 import { PageScraperInterface } from '@xkairo/scrapy-interfaces';
 import { CompanyInterface } from './CompanyInterface';
 import { FindPlaceService } from '../places/FindPlaceService';
+import { LoggerInterface } from '../logger/LoggerInterface';
 
 @Injectable()
 export class CompanyScraper implements PageScraperInterface<CompanyInterface> {
-  constructor(@Inject('searchs') private searchs: string[]) {}
+  constructor(
+    @Inject('searchs') private searchs: string[],
+    @Inject('logger') private logger: LoggerInterface,
+  ) {}
 
   async scrap(): Promise<CompanyInterface[]> {
     const companies: CompanyInterface[] = [];
 
     for (const name of this.searchs) {
-      const res = await this.scrapOne(name);
+      try {
+        const res = await this.scrapOne(name);
 
-      if (res) {
-        companies.push(res);
+        if (res) {
+          companies.push(res);
+          this.logger.info({ message: `Scraped ${name}` });
+        }
+      } catch (e) {
+        const message = `Error to scrap ${name}`;
+        const details: string = e instanceof Error ? e.message : String(e);
+
+        this.logger.error({ message, details });
       }
     }
 

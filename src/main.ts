@@ -9,9 +9,12 @@ import { CsvProcessor } from '@xkairo/scrapy/dist/services/Processors/CsvProcess
 import { join } from 'path';
 import { CompanyScraper } from './companies/CompanyScraper';
 import { getCompaniesNames } from './utils/getCompaniesNames';
+import { LoggerService } from './logger/LoggerService';
 
 const filepathData = join(__dirname, '..', 'data', 'companies.xlsx');
 const filepathScrap = join(__dirname, '..', 'data', 'companiesScrap.csv');
+const filepathErrorLogs = join(__dirname, '..', 'logs', 'error.log');
+const filepathInfoLogs = join(__dirname, '..', 'logs', 'info.log');
 
 (async () => {
   const companiesNames = await getCompaniesNames(filepathData, String(process.env.COUNTRY));
@@ -27,6 +30,15 @@ const filepathScrap = join(__dirname, '..', 'data', 'companiesScrap.csv');
         },
         searchs: {
           useValue: companiesNames,
+        },
+        logger: {
+          useClass: LoggerService,
+        },
+        loggerFilename: {
+          useValue: {
+            info: filepathInfoLogs,
+            error: filepathErrorLogs,
+          },
         },
       },
     ],
