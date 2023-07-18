@@ -1,17 +1,22 @@
-FROM node:18.3.0-alpine3.14 as base
+FROM node:18-alpine AS builder
 
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
+WORKDIR /app
 
 COPY . .
 
-FROM base as production
-
-ENV NODE_ENV=production
-
+RUN npm install
 RUN npm run build
 
-CMD ["npm", "start"]
+FROM node:18-alpine AS final
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+COPY --from=builder ./app/dist ./dist
+
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm install --production
+
+CMD [ "npm", "start" ]
