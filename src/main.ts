@@ -9,7 +9,7 @@ import { CsvProcessor } from '@xkairo/scrapy/dist/services/Processors/CsvProcess
 import { join } from 'path';
 import { CompanyScraper } from './companies/CompanyScraper';
 import { getCompaniesNames } from './utils/getCompaniesNames';
-import { LoggerService } from './logger/LoggerService';
+import { LoggerFilenamesInterface, LoggerService } from './logger/LoggerService';
 
 const filepathData = join(__dirname, '..', 'data', 'companies.xlsx');
 const filepathScrap = join(__dirname, '..', 'data', 'companiesScrap.csv');
@@ -18,6 +18,10 @@ const filepathInfoLogs = join(__dirname, '..', 'logs', 'info.log');
 
 (async () => {
   const companiesNames = await getCompaniesNames(filepathData, String(process.env.COUNTRY));
+  const loggerFilenames: LoggerFilenamesInterface = {
+    info: filepathInfoLogs,
+    error: filepathErrorLogs,
+  };
 
   const configScraper: ScraperConfigInterface<CompanyInterface> = {
     uploaders: [LocalUploader],
@@ -34,11 +38,8 @@ const filepathInfoLogs = join(__dirname, '..', 'logs', 'info.log');
         logger: {
           useClass: LoggerService,
         },
-        loggerFilename: {
-          useValue: {
-            info: filepathInfoLogs,
-            error: filepathErrorLogs,
-          },
+        loggerFilenames: {
+          useValue: loggerFilenames,
         },
       },
     ],
